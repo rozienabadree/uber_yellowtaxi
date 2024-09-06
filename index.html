@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <title> Uber vs. NYC</title>
+    <link rel="stylesheet" type = "text/css" href="style.css">
+    <link rel="icon" type="image/png" href="yellow_cab.png">
+    <style>
+    .tabcode {
+        display: inline-block;
+        margin-left: 160px;
+    }
+    .listcode {
+        display: inline-block;
+        margin-left: 85px;
+    }
+    </style>
+  </head>
+  <body>
+    <center>
+      <h1>Should Uber be capped in NYC?</h1>
+    </center>
+    <div class="tab">
+      <button class="tablink" onclick="openPage('intro', this)" id="defaultOpen">Overview</button>
+      <button class="tablink" onclick="openPage('analysis', this)">The Analysis</button>
+      <button class="tablink" onclick="openPage('code', this)">Data, Techniques & Codes</button>
+      <button class="tablink" onclick="openPage('resources', this)">Resources</button>
+    </div>
+
+    <div id="intro" class="tabcontent">
+      <h2> Overview </h2>
+      <p>
+        Uber has driven NYC's once solid yellow taxi business into brankruptcy.  For this project, I took a deep-dive into their
+        ridership data using data science, particularly Pandas, Pandasql, and MatPlotLib, to prove that Uber controls the taxi market.  I also looked into Uber's lobbying tactics.
+        The results can be found on `The Analysis` page and are worth the read.  Codes and explanations can be found on the `Data, Techniques & Codes`
+        page.  All resources are listed on the `Resources` page. <br><br>
+        Enjoy.
+        <br>
+        <br>
+        <center>
+          <img src="ubervsyt.png" alt="Uber vs NYC Rides 2015-2021">
+        </center>
+      </p>
+      <br><br>
+      <h2> Updates: September 2024 </h2>
+
+      To counteract Uber's dominance and level the playing field, New York City introduced several
+      regulatory measures:<br>
+      <ol>
+        <li><b>Cap on Ride-Hailing Vehicles</b>: In 2018, NYC imposed a cap on the number of new for-hire vehicles that companies like Uber and Lyft could add to their fleets. This was aimed at curbing congestion and stabilizing the yellow taxi industry.</li><br>
+        <li><b>Minimum Wage for Drivers</b>: The city also set a minimum wage for ride-hailing drivers to improve working conditions, which had been a contentious issue with companies like Uber.</li><br>
+        <li><b>Hybrid Taxis & Integration</b>: The NYC Taxi & Limousine Commission (TLC) has pushed for innovations like hybrid and electric yellow taxis to make them more competitive and eco-friendly. There are also efforts to integrate taxis into app-based platforms. For example, Uber started allowing users to hail yellow taxis through its app, which creates an interesting dynamic between the two previously competitive services.<br>
+          <ol type="I">
+            <br><li>In early 2022, Uber began letting users in New York City hail yellow taxis via its app, thanks to a partnership with taxi software companies Curb and Arro. This integration allows riders to book traditional taxis alongside Uber vehicles and provides yellow cab drivers with more fare opportunities, especially during off-peak times. The integration started in beta in spring 2022 and expanded over the summer, with drivers still receiving fares through their existing systems. However, the move has drawn criticism from taxi driver unions like the New York Taxi Workers Alliance (NYTWA), who argue that Uber's fare structure underpays drivers and are calling for fair compensation rates. While there have been discussions about adjusting compensation models, no significant regulatory changes have been implemented.</li>
+          </ol>
+        </li>
+      </ol>
+    </div>
+
+    <div id="analysis" class="tabcontent">
+      <h2> Uber's Data </h2>
+      <p>
+        Uber is the top-performing taxi company in NYC with a total of 753,714,454 rides from 2015 to November 2021.
+      </p>
+      <br>
+      <br>
+      <h2> Yellow Taxi's Data </h2>
+      <p>
+        NYC's Yellow Taxis have been losing millions of rides since January 2015 until April 2021.  The table below shows the difference in ridership between years and most of it is in the negative.
+        For example: the largest difference in ridership between 2015 and 2016 was in January of 2016 with a drop of 1,842,128 rides; the largest drop in ridership between 2016 and 2017 was
+        in February of 2017 with a loss of 2,213,224 rides.  The largest drop in ridership between 2017 and 2018 was in December 2018 etc.  Overall, the largest yearly drop in ridership
+        is between 2019 and 2020 with a loss of 59,750,520 rides.
+      </p>
+      <br>
+      <br>
+      <table style="width:50%" border=2px>
+        <caption>Yellow Taxi's Monthly Decline in Rides</caption>
+        <thead>
+        <tr>
+          <th></th>
+          <th>2015</th>
+          <th>2016</th>
+          <th>2017</th>
+          <th>2018</th>
+          <th>2019</th>
+          <th>2020</th>
+          <th>2021</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>0</td>
+          <td>NaN</td>
+          <td>-1842128</td>
+          <td>-1196734</td>
+          <td>-950250</td>
+          <td>-1092082</td>
+          <td>-1262784</td>
+          <td>-5035243</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>NaN</td>
+          <td>-1068472</td>
+          <td>-2213224</td>
+          <td>-676749</td>
+          <td>-1472701</td>
+          <td>-720021</td>
+          <td>-4927646</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>NaN</td>
+          <td>-1140657</td>
+          <td>-1916324</td>
+          <td>-864252</td>
+          <td>-1597831</td>
+          <td>-4825253</td>
+          <td>-1082140</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>NaN</td>
+          <td>-1137451</td>
+          <td>-1888150</td>
+          <td>-740673</td>
+          <td>-1872376</td>
+          <td>-7195146</td>
+          <td>1933194</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>NaN<br></td>
+          <td>-1321409</td>
+          <td>-1734729</td>
+          <td>-878061</td>
+          <td>-1658802</td>
+          <td>-7216890</td>
+          <td>2158738</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>NaN<br></td>
+          <td>-1189465</td>
+          <td>-1478477</td>
+          <td>-943162</td>
+          <td>-1772807</td>
+          <td>-6391264</td>
+          <td>2284504</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>NaN<br></td>
+          <td>-1268703</td>
+          <td>-1705594</td>
+          <td>-738738</td>
+          <td>-1539329</td>
+          <td>-5510007</td>
+          <td>2021103</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>NaN<br></td>
+          <td>-1188041</td>
+          <td>-1520110</td>
+          <td>-573019</td>
+          <td>-1775777</td>
+          <td>-5066073</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>NaN<br></td>
+          <td>-1109045</td>
+          <td>-1170559</td>
+          <td>-905326</td>
+          <td>-1472345</td>
+          <td>-5226776</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>NaN<br></td>
+          <td>-1460862</td>
+          <td>-1085811</td>
+          <td>-947710</td>
+          <td>-1607214</td>
+          <td>-5532760</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>NaN<br></td>
+          <td>-1210548</td>
+          <td>-817325</td>
+          <td>-1139639</td>
+          <td>-1267053</td>
+          <td>-5369126</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>NaN<br></td>
+          <td>-1011165</td>
+          <td>-941132</td>
+          <td>-1335045</td>
+          <td>-1276914</td>
+          <td>-5434420</td>
+          <td>NaN</td>
+        </tr>
+        <tbody>
+      </table>
+      <br>
+      <br>
+      <p>
+        To drive home the point, please see the graph below which shows the Yellow Taxi's decline in rides.
+      </p>
+      <img src="yellow_taxidecline.png" alt="Yellow Taxi Rides 2015-2021">
+      <br>
+      <br>
+      <h2> Uber vs Yellow Taxi vs NYC </h2>
+      <p>
+        According to the 2015-present data, Uber outperforms their competition in the millions and in doing so, they are becomming a monopoly.
+        Since 2015, Uber has completed an estimated 753,714,454 out of a total of 1,831,217,600 rides, which is 41% of all total rides.  In other words, today Uber controls 41% of the market.
+        In 2020, there was a decline in Uber's ridership and overall taxi rides in 2020 due to the pandemic.  However,
+        Uber still completed 90 million rides in NYC compared to the 1.5 million Yellow Taxi rides.  All other taxi companies also pale in comparison. <br><br>
+        The table below provides the number of yearly rides for the top 4 taxi companies in NYC.
+      </p>
+      <br>
+      <br>
+      <table style="width:50%" border=2px>
+        <caption>Top 4 Cab Companies in NYC</caption>
+        <thead>
+        <tr>
+          <th>Base Name</th>
+          <th>2015</th>
+          <th>2016</th>
+          <th>2017</th>
+          <th>2018</th>
+          <th>2019</th>
+          <th>2020</th>
+          <th>2021</th>
+          <th>Total</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Total</td>
+            <td>207235764</td>
+            <td>259460434</td>
+            <td>302756131</td>
+            <td>363228443</td>
+            <td>363977910</td>
+            <td>182817109</td>
+            <td>151741809</td>
+            <td>1831217600</td>
+          </tr>
+          <tr>
+            <td>Uber</td>
+            <td>36275937</td>
+            <td>70067854</td>
+            <td>109642713</td>
+            <td>163103265</td>
+            <td>181025304</td>
+            <td>103184679</td>
+            <td>90414702</td>
+            <td>753714454</td>
+          </tr>
+          <tr>
+            <td>Yellow Taxi</td>
+            <td>146113001</td>
+            <td>131165055</td>
+            <td>113496886</td>
+            <td>102804262</td>
+            <td>84399031</td>
+            <td>24648511</td>
+            <td>15000707</td>
+            <td>617627453</td>
+          </tr>
+          <tr>
+            <td>Lyft</td>
+            <td>2615481</td>
+            <td>11415958</td>
+            <td>26361098</td>
+            <td>44823801</td>
+            <td>57891012</td>
+            <td>37252636</td>
+            <td>34669137</td>
+            <td>215029123</td>
+          </tr>
+          <tr>
+            <td>Via</td>
+            <td>1767709</td>
+            <td>6085133</td>
+            <td>10324271<br></td>
+            <td>11345582</td>
+            <td>11279889</td>
+            <td>2872556</td>
+            <td>862418</td>
+            <td>44537558</td>
+          </tr>
+          <tbody>
+      </table>
+      <br>
+      <p>
+        The graph below shows Uber's performance against NYC's top 4 taxi companies.
+      </p>
+      <br>
+      <img src="ubervsnyc.png" alt="Uber vs NYC Rides 2015-2021">
+      <br>
+      <p>
+        The graph below shows Uber's performance against NYC's Yellow Taxi company.
+      </p>
+      <br>
+      <img src="ubervsyt.png" alt="Uber vs YT Rides 2015-2021">
+      <br>
+      <br>
+      <h2>The Medallion Crisis</h2>
+      <p>
+        A taxi medallion is a permit that allows a taxicab driver to operate.  Since the creation of rideshare apps in 2011, NYC's taxi medallion's value has plummeted.
+        In 2014, yellow cab medallions were selling for $1 million because NYC's government inflated the medallion's value in an effort to increase revenue.
+        <i>However, they also capped the number of yellow cabs available to about 13,500.</i>  Rideshare vehicles had
+        no such limits and as a result, rideshare apps - particularly Uber - flooded the market, and virtually overnight, the taxi medallion became worthless. <br><br>
+
+        At the height of this madness, the average cab driver owed $600,000 in medallion debt, an impossible sum to pay back because they work in a dying industry.
+        As of November 2021, the New York Taxi Worker's Association announced a deal with Mayor Bill de Blasio for a $65 million debt relief program where a driver's debt
+        is capped to $145,000 with maximum monthly payments of $800, and the restitution of all foreclosed medallions to their owners. <br><br>
+
+        Rideshare apps - particularly Uber - are a problem and they should be capped.
+
+        For more information, please see <a href = "https://documentedny.com/2021/11/23/taxi-cab-medallion-explained/">Documented's article</a> on the Yellow Taxi's brankruptcy.
+      </p>
+      <br>
+      <br>
+      <h2>Ridership</h2>
+      <p>
+        <a href="https://www.investopedia.com/articles/personal-finance/021015/uber-versus-yellow-cabs-new-york-city.asp">Investopedia</a> recently investigated Uber's prices and produced the table below.  It is difficult to understand
+        how these pricing structures work in real life but the overall takeaway is that taxis are cheaper in NYC when traffic
+        is flowing under 20 miles per hour whereas Uber is cheaper in other cases unless it is charging high-demand fares. <br><br>
+
+        A few other key takeaways include the following:
+        <ul>
+          <li> Uber and Yellow Taxis both charge fares based on a combination of time and distance. </li>
+          <li> Yellow Taxis do not have surge pricing, but riders may have to wait longer for a taxi. </li>
+          <li> Unlike Yellow Taxis, Uber does not alter rates based on speed. </li>
+        </ul>
+        Please see <a href="https://www.investopedia.com/articles/personal-finance/021015/uber-versus-yellow-cabs-new-york-city.asp">Investopedia's chart</a> below, which provides a breakdown of Uber's fares.<br>
+      </p>
+      <table style="width:50%" border=2px>
+        <tr>
+          <th>TYPE</th>
+          <th>DESCRIPTION</th>
+          <th>BASE FARE</th>
+          <th>FINANCIAL BREAKDOWN</th>
+          <th>MINIMUM FARE</th>
+        </tr>
+        <tbody>
+          <tr>
+            <td>UberX</td>
+            <td>regular/professional drivers; regular cars</td>
+            <td>$2.55</td>
+            <td>$0.35 per minute + $1.75 per mile</td>
+            <td>$7.00</td>
+          </tr>
+          <tr>
+            <td>uberXL</td>
+            <td>regular/professional drivers; regular SUVs</td>
+            <td>$3.85</td>
+            <td>$0.50 per minute + $2.85 per mile</td>
+            <td>$10.50</td>
+          </tr>
+          <tr>
+            <td>UberBLACK</td>
+            <td>professional drivers; upscale cars</td>
+            <td>$7.00</td>
+            <td>$0.65 per minute + $3.75 per mile</td>
+            <td>$15.00</td>
+          </tr>
+          <tr>
+            <td>UberSUV</td>
+            <td>professional drivers; upscale SUVs</td>
+            <td>$14.00</td>
+            <td>$0.65 per minute + $3.75 per mile</td>
+            <td>$25.00</td>
+          </tr>
+          <tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      <h2>Uber's Lobbying</h2>
+      <p>
+        Uber has over 250 lobbyists and 49 lobbying firms in the United Sates alone.  Their lobbying force is bigger
+        than Google's, Facebook's, and Walmart's. So what exactly does Uber do with all of these lobbyists?  They
+        are attempting to maximize profits by <i>changing what is expected of transportation divers</i>.  For example: Uber currently under-insures
+        their drivers, they've reduced their rate of international taxes, and classify their
+        employees as independent contractors to avoid providing benefits and/or a union contract.  Please also note that Uber's "low prices"
+        are a result of tax avoidance and bad labor practices. <br><br>
+
+        Recently, Uber launched a $10 million dollar campaign against Mayor Bill de Blasio who proposed capping the number of Uber
+        vehicles in an effort to reduce congestion.  The outcome of that battle was that City Hall gets additional data about Uber's
+        trips. <br><br>
+
+        The message that Uber is sending is clear: they are a monopoly that has forced the Mayor of NYC to back down.  Uber is a problem and they must be capped.
+
+        For more information, please see <a href="https://www.jwj.org/how-much-will-uber-spend-to-get-its-way">this article from Jobs with Justice</a>.
+      </p>
+    </div>
+<!-- page # 3 -->
+    <div id="code" class="tabcontent">
+      <h2>1. A sum of Uber's total rides from 2015 to present date. </h2>
+      <h3> Data & Technique: </h3>
+      <p>
+        <a name = "p1"> Using NYC Open Data's </a>
+        <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/f0b6026c17d090ba2f385573b43da46ccf0017b6/uber_Data.csv" >uber_Data.csv</a>
+           file and Pandas, it was found that Uber had a total of 753,714,454 rides from 2015 to present date.  To obtain this number, the CSV file was loaded into a Pandas dataframe and the numbers that were in the `Total Dispatched Trips` column were converted to integers and summed.
+      </p>
+      <h3> Code: </h3>
+      <code class="codeblock">
+        <br>
+        df = pd.read_csv('uber_Data.csv') <br>
+        df['Total Dispatched Trips'] = df['Total Dispatched Trips'].str.replace(",","").astype(int) <br>
+        total = df['Total Dispatched Trips'].sum() <br>
+        print(total) <br>
+        <br>
+      </code>
+      <br>
+      <h2>2. Analyzing Yellow Taxi's monthly raw data from 2015 to present date. </h2>
+      <h3> Data & Technique: </h3>
+      <p>
+        79 CSV files were used to analyze the Yellow Taxi's ridership.  The analysis ranged from years 2015 to 2021: there are 12 monthly files for years 2015-2020 and 7 files for 2021.
+        That monthly raw data can be found <a href = "https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page">here</a>.  A list of the names the CSV files used is provided in the table below. <br><br>
+        <table style="width:50%" border=2px>
+      	<caption>CSV Files Used in Yellow Taxi Analysis</caption>
+      	<thead>
+      	<tr>
+      		<th><br></th>
+      		<th>2015</th>
+      		<th>2016</th>
+      		<th>2017</th>
+      		<th>2018</th>
+      		<th>2019</th>
+      		<th>2020</th>
+      		<th>2021</th>
+      	</tr>
+      	</thead>
+      	<tbody>
+      	<tr>
+      		<td>JAN</td>
+      		<td>yellow_tripdata_2015-01.csv</td>
+      		<td>yellow_tripdata_2016-01.csv</td>
+      		<td>yellow_tripdata_2017-01.csv</td>
+      		<td>yellow_tripdata_2018-01.csv</td>
+      		<td>yellow_tripdata_2019-01.csv</td>
+      		<td>yellow_tripdata_2020-01.csv</td>
+      		<td>yellow_tripdata_2021-01.csv</td>
+      	</tr>
+      	<tr>
+      		<td>FEB</td>
+      		<td>yellow_tripdata_2015-02.csv</td>
+      		<td>yellow_tripdata_2016-02.csv</td>
+      		<td>yellow_tripdata_2017-02.csv</td>
+      		<td>yellow_tripdata_2018-02.csv</td>
+      		<td>yellow_tripdata_2019-02.csv</td>
+      		<td>yellow_tripdata_2020-02.csv</td>
+      		<td>yellow_tripdata_2021-02.csv</td>
+      	</tr>
+      	<tr>
+      		<td>MAR</td>
+      		<td>yellow_tripdata_2015-03.csv</td>
+      		<td>yellow_tripdata_2016-03.csv</td>
+      		<td>yellow_tripdata_2017-03.csv</td>
+      		<td>yellow_tripdata_2018-03.csv</td>
+      		<td>yellow_tripdata_2019-03.csv</td>
+      		<td>yellow_tripdata_2020-03.csv</td>
+      		<td>yellow_tripdata_2021-03.csv</td>
+      	</tr>
+      	<tr>
+      		<td>APR</td>
+      		<td>yellow_tripdata_2015-04.csv</td>
+      		<td>yellow_tripdata_2016-04.csv</td>
+      		<td>yellow_tripdata_2017-04.csv</td>
+      		<td>yellow_tripdata_2018-04.csv</td>
+      		<td>yellow_tripdata_2019-04.csv</td>
+      		<td>yellow_tripdata_2020-04.csv</td>
+      		<td>yellow_tripdata_2021-04.csv</td>
+      	</tr>
+      	<tr>
+      		<td>MAY</td>
+      		<td>yellow_tripdata_2015-05.csv</td>
+      		<td>yellow_tripdata_2016-05.csv</td>
+      		<td>yellow_tripdata_2017-05.csv</td>
+      		<td>yellow_tripdata_2018-05.csv</td>
+      		<td>yellow_tripdata_2019-05.csv</td>
+      		<td>yellow_tripdata_2020-05.csv</td>
+      		<td>yellow_tripdata_2021-05.csv</td>
+      	</tr>
+      	<tr>
+      		<td>JUN</td>
+      		<td>yellow_tripdata_2015-06.csv</td>
+      		<td>yellow_tripdata_2016-06.csv</td>
+      		<td>yellow_tripdata_2017-06.csv</td>
+      		<td>yellow_tripdata_2018-06.csv</td>
+      		<td>yellow_tripdata_2019-06.csv</td>
+      		<td>yellow_tripdata_2020-06.csv</td>
+      		<td>yellow_tripdata_2021-06.csv</td>
+      	</tr>
+      	<tr>
+      		<td>JUL</td>
+      		<td>yellow_tripdata_2015-07.csv</td>
+      		<td>yellow_tripdata_2016-07.csv</td>
+      		<td>yellow_tripdata_2017-07.csv</td>
+      		<td>yellow_tripdata_2018-07.csv</td>
+      		<td>yellow_tripdata_2019-07.csv</td>
+      		<td>yellow_tripdata_2020-07.csv</td>
+      		<td>yellow_tripdata_2021-07.csv</td>
+      	</tr>
+      	<tr>
+      		<td>AUG</td>
+      		<td>yellow_tripdata_2015-08.csv</td>
+      		<td>yellow_tripdata_2016-08.csv</td>
+      		<td>yellow_tripdata_2017-08.csv</td>
+      		<td>yellow_tripdata_2018-08.csv</td>
+      		<td>yellow_tripdata_2019-08.csv</td>
+      		<td>yellow_tripdata_2020-08.csv</td>
+      		<td></td>
+      	</tr>
+      	<tr>
+      		<td>SEPT</td>
+      		<td>yellow_tripdata_2015-09.csv</td>
+      		<td>yellow_tripdata_2016-09.csv</td>
+      		<td>yellow_tripdata_2017-09.csv</td>
+      		<td>yellow_tripdata_2018-09.csv</td>
+      		<td>yellow_tripdata_2019-09.csv</td>
+      		<td>yellow_tripdata_2020-09.csv</td>
+      		<td></td>
+      	</tr>
+      	<tr>
+      		<td>OCT</td>
+      		<td>yellow_tripdata_2015-10.csv</td>
+      		<td>yellow_tripdata_2016-10.csv</td>
+      		<td>yellow_tripdata_2017-10.csv</td>
+      		<td>yellow_tripdata_2018-10.csv</td>
+      		<td>yellow_tripdata_2019-10.csv</td>
+      		<td>yellow_tripdata_2020-10.csv</td>
+      		<td></td>
+      	</tr>
+      	<tr>
+      		<td>NOV</td>
+      		<td>yellow_tripdata_2015-11.csv</td>
+      		<td>yellow_tripdata_2016-11.csv</td>
+      		<td>yellow_tripdata_2017-11.csv</td>
+      		<td>yellow_tripdata_2018-11.csv</td>
+      		<td>yellow_tripdata_2019-11.csv</td>
+      		<td>yellow_tripdata_2020-11.csv</td>
+      		<td></td>
+      	</tr>
+      	<tr>
+      		<td>DEC</td>
+      		<td>yellow_tripdata_2015-12.csv</td>
+      		<td>yellow_tripdata_2016-12.csv</td>
+      		<td>yellow_tripdata_2017-12.csv</td>
+      		<td>yellow_tripdata_2018-12.csv</td>
+      		<td>yellow_tripdata_2019-12.csv</td>
+      		<td>yellow_tripdata_2020-12.csv</td>
+      		<td></td>
+      	</tr>
+      	<tbody>
+      </table>
+      <br>
+      <br>
+        Regarding technique, each CSV file was analyzed using a Pandas dataframe.  Since each row represents a different trip, the length of the dataframe was calculated plus 1 to accomodate for row [0].
+        The code used to analyze the monthly data from 2015 is below.  This code was applied to the CSV files for years 2016-2021 with the names and variables changed. </a>
+      </p>
+      <h3> Code: </h3>
+      <code class="codeblock">
+        <br>
+        import pandas as pd <br><br>
+
+        #Total number of Jan 2015 yellow-taxi trips. <br>
+        jan2015 = pd.read_csv('yellow_tripdata_2015-01.csv',low_memory=False) <br>
+        trips_01_2015 = len(jan2015)+1 <br>
+        ##print(trips_01_2015) <br><br>
+
+        #Total number of Feb 2015 yellow-taxi trips. <br>
+        feb2015 = pd.read_csv('yellow_tripdata_2015-02.csv',low_memory=False) <br>
+        trips_02_2015 = len(feb2015)+1 <br>
+        ##print(trips_02_2015) <br><br>
+
+        #Total number of March 2015 yellow-taxi trips. <br>
+        mar2015 = pd.read_csv('yellow_tripdata_2015-03.csv',low_memory=False) <br>
+        trips_03_2015 = len(mar2015)+1 <br>
+        ##print(trips_03_2015) <br><br>
+
+        #Total number of April 2015 yellow-taxi trips. <br>
+        apr2015 = pd.read_csv('yellow_tripdata_2015-04.csv',low_memory=False) <br>
+        trips_04_2015 = len(apr2015)+1 <br>
+        ##print(trips_04_2015) <br><br>
+
+        #Total number of May 2015 yellow-taxi trips. <br>
+        may2015 = pd.read_csv('yellow_tripdata_2015-05.csv',low_memory=False) <br>
+        trips_05_2015 = len(may2015)+1 <br>
+        ##print(trips_05_2015) <br><br>
+
+        #Total number of June 2015 yellow-taxi trips. <br>
+        jun2015 = pd.read_csv('yellow_tripdata_2015-06.csv',low_memory=False) <br>
+        trips_06_2015 = len(jun2015)+1 <br>
+        ##print(trips_06_2015) <br><br>
+
+        #Total number of July 2015 yellow-taxi trips. <br>
+        july2015 = pd.read_csv('yellow_tripdata_2015-07.csv',low_memory=False) <br>
+        trips_07_2015 = len(july2015)+1 <br>
+        ##print(trips_07_2015) <br><br>
+
+        #Total number of August 2015 yellow-taxi trips. <br>
+        aug2015 = pd.read_csv('yellow_tripdata_2015-08.csv',low_memory=False) <br>
+        trips_08_2015 = len(aug2015)+1 <br>
+        ##print(trips_08_2015) <br><br>
+
+        #Total number of September 2015 yellow-taxi trips. <br>
+        sept2015 = pd.read_csv('yellow_tripdata_2015-09.csv',low_memory=False) <br>
+        trips_09_2015 = len(sept2015)+1 <br>
+        ##print(trips_09_2015) <br><br>
+
+        #Total number of October 2015 yellow-taxi trips. <br>
+        oct2015 = pd.read_csv('yellow_tripdata_2015-10.csv',low_memory=False) <br>
+        trips_10_2015 = len(oct2015)+1 <br>
+        ##print(trips_10_2015) <br><br>
+
+        #Total number of November 2015 yellow-taxi trips. <br>
+        nov2015 = pd.read_csv('yellow_tripdata_2015-11.csv',low_memory=False) <br>
+        trips_11_2015 = len(nov2015)+1 <br>
+        ##print(trips_11_2015) <br><br>
+
+        #Total number of December 2015 yellow-taxi trips. <br>
+        dec2015 = pd.read_csv('yellow_tripdata_2015-12.csv',low_memory=False) <br>
+        trips_12_2015 = len(dec2015)+1 <br>
+        ##print(trips_12_2015) <br><br>
+
+        list_2015 = [trips_01_2015,trips_02_2015,trips_03_2015,trips_04_2015,trips_05_2015,trips_06_2015, <br><span class="listcode"></span>
+                    trips_07_2015,trips_08_2015,trips_09_2015,trips_10_2015,trips_11_2015,trips_12_2015] <br> <br><br>
+
+        df2015 = pd.DataFrame(list_2015, columns = ['2015']) <br>
+        df2015.to_csv('yellow-taxi-2015.csv', index=False) <br>
+        <br>
+      </code>
+      <h3> Data & Technique: </h3>
+      <p>
+        <a name = "p1"> Using the code above, the <a href = "https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page" >Yellow Taxi's monthly raw data from 2015 to present date</a>
+        was summed and compiled into yearly spreadsheets, which were then summed into one large file.  Then, each yearly spreadsheet was read into its own dataframe.
+        Those dataframes were concatentated into 1 dataframe that shows the monthly rides for each year.  The difference between the months of each year (also the difference between
+        the columns) was calculated using <i>diff(axis=1)</i>.  The yearly sum was also calculated and exported to the
+        <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/bed3fcb01a1e8dbfd4de5e3865efef7bc7f39296/yellow_taxidata.csv" >'yellow-taxi-2015.csv'</a> file.
+        Lastly, a graph showing the Yellow Taxi's ridership was generated using MatPlotLib.
+
+      </p>
+      <h3> Code: </h3>
+      <code class="codeblock">
+        <br>
+        import matplotlib.pyplot as plt <br>
+        import pandas as pd <br> <br>
+
+        #Read in each CSV file compiled from monthly raw data. <br>
+        data1 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2015.csv" >'yellow-taxi-2015.csv'</a>) <br>
+        data2 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2016.csv" >'yellow-taxi-2016.csv'</a>) <br>
+        data3 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2017.csv" >'yellow-taxi-2017.csv'</a>) <br>
+        data4 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2018.csv" >'yellow-taxi-2018.csv'</a>) <br>
+        data5 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2019.csv" >'yellow-taxi-2019.csv'</a>) <br>
+        data6 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2020.csv" >'yellow-taxi-2020.csv'</a>) <br>
+        data7 = pd.read_csv(<a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/3f81d9ace80217c1305a5bbb7261d5d11a5b17e0/yellow-taxi-2021.csv" >'yellow-taxi-2021.csv'</a>) <br> <br>
+
+        #Concatenate the dataframes. <br>
+        frames = [data1, data2, data3, data4, data5, data6, data7] <br>
+        df = pd.concat(frames, axis = 1) <br> <br>
+
+        #Find the difference in trips between each year. <br>
+        print(df.diff(axis = 1)) <br>
+        print(df.sum().diff()) <br> <br>
+
+        #Prepare file to merge. <br>
+        df = df.fillna(0) <br>
+        result = df.sum(axis=0) <br>
+        result.to_csv('yellow_taxidata.csv', index=True, index_label='Year', header=['Total Dispatched Trips']) <br>
+        ax = result.plot(kind='line', title='Yellow Taxi Decline\n2015-2021') <br>
+        ax.set(xlabel='year', ylabel='# of rides in hundred millions') <br>
+        fig2 = plt.gcf() <br>
+        fig2.savefig('yellow_taxidecline.png') <br>
+        plt.show() <br>
+        <br>
+      </code>
+      <table style="width:50%" border=2px>
+      	<caption>Yellow Taxi's Monthly Decline in Rides</caption>
+      	<thead>
+      	<tr>
+          <th></th>
+      		<th>2015</th>
+      		<th>2016</th>
+      		<th>2017</th>
+      		<th>2018</th>
+      		<th>2019</th>
+      		<th>2020</th>
+      		<th>2021</th>
+      	</tr>
+      	</thead>
+      	<tbody>
+      	<tr>
+          <td>0</td>
+      		<td>NaN</td>
+      		<td>-1842128</td>
+      		<td>-1196734</td>
+      		<td>-950250</td>
+      		<td>-1092082</td>
+      		<td>-1262784</td>
+      		<td>-5035243</td>
+      	</tr>
+      	<tr>
+          <td>1</td>
+      		<td>NaN</td>
+      		<td>-1068472</td>
+      		<td>-2213224</td>
+      		<td>-676749</td>
+      		<td>-1472701</td>
+      		<td>-720021</td>
+      		<td>-4927646</td>
+      	</tr>
+      	<tr>
+          <td>2</td>
+      		<td>NaN</td>
+      		<td>-1140657</td>
+      		<td>-1916324</td>
+      		<td>-864252</td>
+      		<td>-1597831</td>
+      		<td>-4825253</td>
+      		<td>-1082140</td>
+      	</tr>
+      	<tr>
+          <td>3</td>
+      		<td>NaN</td>
+      		<td>-1137451</td>
+      		<td>-1888150</td>
+      		<td>-740673</td>
+      		<td>-1872376</td>
+      		<td>-7195146</td>
+      		<td>1933194</td>
+      	</tr>
+      	<tr>
+          <td>4</td>
+      		<td>NaN<br></td>
+      		<td>-1321409</td>
+      		<td>-1734729</td>
+      		<td>-878061</td>
+      		<td>-1658802</td>
+      		<td>-7216890</td>
+      		<td>2158738</td>
+      	</tr>
+      	<tr>
+          <td>5</td>
+      		<td>NaN<br></td>
+      		<td>-1189465</td>
+      		<td>-1478477</td>
+      		<td>-943162</td>
+      		<td>-1772807</td>
+      		<td>-6391264</td>
+      		<td>2284504</td>
+      	</tr>
+      	<tr>
+          <td>6</td>
+      		<td>NaN<br></td>
+      		<td>-1268703</td>
+      		<td>-1705594</td>
+      		<td>-738738</td>
+      		<td>-1539329</td>
+      		<td>-5510007</td>
+      		<td>2021103</td>
+      	</tr>
+      	<tr>
+          <td>7</td>
+      		<td>NaN<br></td>
+      		<td>-1188041</td>
+      		<td>-1520110</td>
+      		<td>-573019</td>
+      		<td>-1775777</td>
+      		<td>-5066073</td>
+      		<td>NaN</td>
+      	</tr>
+      	<tr>
+          <td>8</td>
+      		<td>NaN<br></td>
+      		<td>-1109045</td>
+      		<td>-1170559</td>
+      		<td>-905326</td>
+      		<td>-1472345</td>
+      		<td>-5226776</td>
+      		<td>NaN</td>
+      	</tr>
+      	<tr>
+          <td>9</td>
+      		<td>NaN<br></td>
+      		<td>-1460862</td>
+      		<td>-1085811</td>
+      		<td>-947710</td>
+      		<td>-1607214</td>
+      		<td>-5532760</td>
+      		<td>NaN</td>
+      	</tr>
+      	<tr>
+          <td>10</td>
+      		<td>NaN<br></td>
+      		<td>-1210548</td>
+      		<td>-817325</td>
+      		<td>-1139639</td>
+      		<td>-1267053</td>
+      		<td>-5369126</td>
+      		<td>NaN</td>
+      	</tr>
+      	<tr>
+          <td>11</td>
+      		<td>NaN<br></td>
+      		<td>-1011165</td>
+      		<td>-941132</td>
+      		<td>-1335045</td>
+      		<td>-1276914</td>
+      		<td>-5434420</td>
+      		<td>NaN</td>
+      	</tr>
+      	<tbody>
+      </table>
+      <img src="yellow_taxidecline.png" alt="Yellow Taxi Rides 2015-2021">
+      <br>
+      <h2>3. Working with Uber's, Yellow Taxi's, and TLC's small business data. </h2>
+      <h3> Data & Technique: </h3>
+      <p>
+        <a name = "p1"> A more comprehensive analysis was done using the </a>
+        <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/1539353e2c195af278d8d560b46bfa4278c4e538/FHV_Base_Aggregate_Report.csv">FHV_Base_Aggregate_Report.csv</a>
+           file, which is a tally of all non-yellow-cab rides in NYC between 2015 and 2021, and the
+           <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/bed3fcb01a1e8dbfd4de5e3865efef7bc7f39296/yellow_taxidata.csv">yellow_taxidata.csv</a>
+           file, which I produced from the Yellow Taxi's <a href = "https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page">raw monthly data</a> and the codes above.
+           These files were analyzed to produce a <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/b65dd8a9a8a978bb7f94cd73fbc1985fcce3b557/aggregate_analysis.csv">pivot table</a>
+           and the graphs below (Uber vs NYC Rides and Uber vs Yellow Taxi Rides).
+           <br>
+           <br>
+           Regarding technique, the <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/1539353e2c195af278d8d560b46bfa4278c4e538/FHV_Base_Aggregate_Report.csv">FHV_Base_Aggregate_Report.csv</a>
+           and the <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/bed3fcb01a1e8dbfd4de5e3865efef7bc7f39296/yellow_taxidata.csv">yellow_taxidata.csv</a> files were read into individual Pandas dataframes.
+           Then, their columns and data were cleaned and organized using Pandas and Pandasql.  The dataframes were concatenated into 1 dataframe, which was pivoted to generate
+           a table with each year in its own column and each company in its own row.  Those results can be found in the
+           <a href = "https://github.com/rozienabadree/projectcsci39542.github.io/blob/b65dd8a9a8a978bb7f94cd73fbc1985fcce3b557/aggregate_analysis.csv">aggregate_analysis.csv/pivot table</a> file.
+           Lastly, this data was filtered and transposed using Pandas and graphed using MatPlotLib.
+      </p>
+      <h3> Code: </h3>
+      <code class="codeblock">
+        <br>
+        import matplotlib.pyplot as plt <br>
+        import pandas as pd <br>
+        import pandasql as psql <br><br>
+
+        #Read the CSV files into a dataframe. <br>
+        df1 = pd.read_csv('FHV_Base_Aggregate_Report.csv') <br>
+        df2 = pd.read_csv('yellow_taxidata.csv') <br><br>
+
+        """ <br>
+        Clean the data. <br>
+        1. Change the case for the `Base Name` column. <br>
+        2. Convert each value in the `Total Dispatched Trips` column to integers. <br>
+        3. Add the `Base Name` column to the second data frame. <br>
+        4. Reindex the second dataframe to match the first. <br>
+        """ <br><br>
+
+        df1['Base Name']= df1['Base Name'].str.upper().str.title() <br>
+        df1['Total Dispatched Trips'] = df1['Total Dispatched Trips'].str.replace(",","").astype(int) <br>
+        df2['Base Name'] = 'Yellow Taxi' <br>
+        df2 = df2.reindex(columns=['Base Name', 'Year', 'Total Dispatched Trips']) <br><br>
+
+        #Organize/select the data from the first dataframe. <br>
+        name_year_trips = """ <br>
+        SELECT DISTINCT `BASE NAME`, YEAR, SUM(`TOTAL DISPATCHED TRIPS`)  AS `Total Dispatched Trips` <br>
+        FROM df1 <br>
+        GROUP BY `BASE NAME`, YEAR <br>
+        """ <br>
+        query = psql.sqldf(name_year_trips) <br><br>
+
+        #Join the data from the two dataframes. <br>
+        frames = [query, df2] <br>
+        concat = pd.concat(frames, ignore_index=True) <br><br>
+
+        #Create the pivot table. <br>
+        pivot = pd.pivot_table(concat, index='Base Name', <br><span class="tabcode"></span>
+                                         columns='Year', <br><span class="tabcode"></span>
+                                         values='Total Dispatched Trips', <br><span class="tabcode"></span>
+                                         aggfunc='sum', <br><span class="tabcode"></span>
+                                         fill_value=0, <br><span class="tabcode"></span>
+                                         margins=True, <br><span class="tabcode"></span>
+                                         margins_name='Total').sort_values('Total',
+                                                                             ascending=False) <br><br>
+
+        #Save this data to a CSV file for later use. <br>
+        pivot.to_csv('aggregate_analysis.csv') <br><br>
+
+        #Working with the same pivot table, view the top 5 companies and drop the totals row and column. <br>
+        pivot = pivot.drop(columns='Total') <br>
+        pivot = pivot.drop('Total') <br>
+        top_cabs = pivot.head(5) <br><br>
+
+        #Transpose the rows and columns to arrange the data in such a way that it can be graphed. <br>
+        top_cabs_transposed = top_cabs.T <br><br>
+
+        #Graph, save, and show the data. <br>
+        ax = top_cabs_transposed.plot(kind='line', title='Uber vs NYC Rides\n2015-2021') <br>
+        ax.set(xlabel='year', ylabel='# of rides in hundred millions') <br>
+        fig = plt.gcf() <br>
+        fig.savefig('ubervsnyc.png') <br>
+        plt.show() <br><br>
+
+        #Pulling only Uber's and Yellow Taxi's data using the methods above. <br>
+        top_cabs2 = pivot.head(2) <br>
+        top_cabs_transposed2 = top_cabs2.T <br>
+        bx = top_cabs_transposed2.plot(kind='line', title='Uber vs Yellow Taxi Rides\n2015-2021') <br>
+        bx.set(xlabel='year', ylabel='# of rides in hundred millions') <br>
+        fig = plt.gcf() <br>
+        fig.savefig('ubervsyt.png') <br>
+        plt.show() <br><br>
+      </code>
+      <img src="ubervsnyc.png" alt="Uber vs NYC Rides 2015-2021">     <img src="ubervsyt.png" alt="Uber vs YT Rides 2015-2021">
+    </div>
+<!-- My resources page -->
+    <div id="resources" class="tabcontent">
+      <h3>Resources</h3>
+      <p>Thank you to NYC Open Data for their content. </p>
+      <ul>
+        <li>This <a href = "https://data.cityofnewyork.us/Transportation/uber-Data/3jeu-mn7j">file</a> was used to produce the total number of Uber's rides in NYC since 2015.</li>
+        <li>These <a href = "https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page">files</a> were used to analyze the Yellow Taxi's ridership from 2015 to present day.</li>
+        <li>This <a href = "https://data.cityofnewyork.us/Transportation/FHV-Base-Aggregate-Report/2v9c-2k7f">file</a> was used to generate the total number of taxi rides in NYC and to compare Uber's ridership to smaller taxi businesses.</li>
+      </ul>
+      <p>Thank you to <a href = "https://www.investopedia.com/articles/personal-finance/021015/uber-versus-yellow-cabs-new-york-city.asp">Investopedia</a> for their fare breakdown. </p>
+      <p>Thank you to <a href = "https://documentedny.com/2021/11/23/taxi-cab-medallion-explained/">Documented</a> for investigating NYC's Yellow Taxi brankruptcy. </p>
+      <p>Thank you to <a href = "https://www.businessinsider.com/uber-shareholders-letter-demands-lobbying-transparency-2021-4?op=1">this shareholder</a> for demanding transparency re: Uber's lobbying. </p>
+      <p>Thank you to the <a href = "https://nypost.com/2018/08/04/ride-sharing-companies-spent-over-1m-lobbying-in-nyc/">New York Post</a> and <a href = "https://www.nytimes.com/2020/10/12/technology/you-cant-escape-ubers-lobbying.html">The New York Times</a> for reporting on Uber's lobbying. </p>
+      <p>Thank you to <a href = "https://www.jwj.org/how-much-will-uber-spend-to-get-its-way">Jobs with Justice</a> for calling out Uber's lobbying and bullying tactics. </p>
+    </div>
+
+
+    <script> function openPage(pageName, elmnt) {
+      // Hide all elements with class="tabcontent" by default
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      // Show the specific tab content
+      document.getElementById(pageName).style.display = "block";
+      }
+      // Get the element with id="defaultOpen" and click on it
+      document.getElementById("defaultOpen").click();
+    </script>
+  </body>
+</html>
